@@ -3,7 +3,7 @@ Stagit, containerized
 
 ## Usage
 
-You will find a basic example in the `example` repository.
+You will find a basic example in the [example](example/).
 
 TL;DR:
 
