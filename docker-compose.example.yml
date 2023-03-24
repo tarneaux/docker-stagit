@@ -1,0 +1,13 @@
+version: "3"
+
+services:
+  stagit:
+    build: .
+    ports:
+      - "8080:80"
+    volumes:
+      # The directory where your repositories are stored
+      - ./repos:/repos
+      - ./config:/config
+    environment:
+      BASEURL: http://localhost:8080
