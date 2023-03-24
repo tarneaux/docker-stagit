@@ -24,4 +24,5 @@ services:
 ```
 
 
+For more information, see the `stagit` manpage.
 
