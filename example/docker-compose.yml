@@ -2,7 +2,7 @@ version: "3"
 
 services:
   stagit:
-    build: .
+    image: ghcr.io/tarneaux/stagit:latest
     ports:
       - "8080:80"
     volumes:
