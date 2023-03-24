@@ -12,6 +12,8 @@ cd $REPOS_PATH
 repos_list=$(ls -d *)
 cd -
 
+[[ -z "$repos_list" ]] && echo "No repos found" && exit 1
+
 cd $BUILD_PATH
 
 for repo in $repos_list; do
