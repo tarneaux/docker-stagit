@@ -1,5 +1,7 @@
 # stagit-docker
-Stagit, containerized
+Stagit, containerized.
+
+This only handles the web part. To be able to clone you will need another tool which has read and write access to the repos directory (I'll make my own dockerized one soon)
 
 ## Usage
 
