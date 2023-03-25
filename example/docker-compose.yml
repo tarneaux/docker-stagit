@@ -2,10 +2,6 @@ version: "3"
 
 services:
   stagit:
-    # For development:
-    # build: ..
-
-    # For production:
     image: ghcr.io/tarneaux/stagit:latest
 
     ports:
