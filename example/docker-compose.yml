@@ -2,12 +2,19 @@ version: "3"
 
 services:
   stagit:
+    # For development:
+    # build: ..
+
+    # For production:
     image: ghcr.io/tarneaux/stagit:latest
+
     ports:
       - "8080:80"
+
     volumes:
       # The directory where your repositories are stored
       - ./repos:/repos
       - ./config:/config
+
     environment:
       BASEURL: http://localhost:8080
