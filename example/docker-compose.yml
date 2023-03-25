@@ -4,6 +4,8 @@ services:
   stagit:
     image: ghcr.io/tarneaux/stagit:latest
 
+    restart: unless-stopped
+
     ports:
       - "8080:80"
 
