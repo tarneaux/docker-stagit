@@ -9,12 +9,24 @@ You will find a basic example in the [example](example/).
 
 TL;DR:
 
+Create a repos directory. Put your repos in there.
+
+The config directory is optional. It contains the files as described by the `stagit` manpage:
+
+- `favicon.png`: favicon image.
+
+- `logo.png`: 32x32 logo.
+
+- `style.css`: CSS stylesheet.
+
+
 ```yaml
 version: "3"
 
 services:
   stagit:
     image: ghcr.io/tarneaux/stagit:latest
+    restart: unless-stopped
     ports:
       - "8080:80"
     volumes:
