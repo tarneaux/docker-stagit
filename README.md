@@ -3,6 +3,11 @@ Stagit, containerized.
 
 This only handles the web part. To be able to clone you will need another tool which has read and write access to the repos directory (I'll make my own dockerized one soon)
 
+## Features
+
+- [x] filter out repos that contain a `.private` file in their root
+- [ ] automatically rebuild when a repo is changed
+
 ## Usage
 
 You will find a basic example in the [example](example/).

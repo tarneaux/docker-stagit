@@ -11,8 +11,17 @@ CONFIG_PATH=/config
 
 scan_repos() {
     cd $REPOS_PATH
-    repos_list=$(ls -d */ .*/) # List all repos, including ones starting with a dot (hidden)
+    pre_repos_list=$(ls -d */ .*/) # List all repos, including ones starting with a dot (hidden)
     cd -
+    repos_list=""
+    for repo in $pre_repos_list; do
+        # Filter out private repos
+        if [[ -f $REPOS_PATH/$repo/.private ]]; then
+            echo "Private repo: $repo"
+        else
+            repos_list="$repos_list $repo"
+        fi
+    done
 }
 
 scan_repos
