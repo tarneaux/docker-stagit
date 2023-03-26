@@ -28,6 +28,16 @@ scan_repos
 
 [[ -z "$repos_list" ]] && echo "No repos found" && exit 1
 
+prebuild_repo() {
+    # Add some informational files for stagit from the env vars
+
+    # owner, except if overridden by a file in the repo
+    [[ $OWNER ]] && [[ -f $REPOS_PATH/$1/.git/owner ]] || echo $OWNER > $REPOS_PATH/$1/.git/owner
+
+    # Remote url for git. Changes according to the repo name
+    [[ $REMOTE ]] && echo $REMOTE/$1 > $REPOS_PATH/$1/.git/url
+}
+
 build_repo() {
     echo "Building $1"
     mkdir $1
@@ -41,6 +51,7 @@ build() {
     cd $BUILD_PATH
 
     for repo in $repos_list; do
+        prebuild_repo $repo
         build_repo $repo
     done
 
