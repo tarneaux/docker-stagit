@@ -8,6 +8,8 @@ This only handles the web part. To be able to clone you will need another tool w
 - [x] filter out repos that contain a `.private` file in their root
 - [ ] automatically rebuild when a repo is changed
 
+> :warning: For now, you will have to restart the container each time you make a change to a repo. Consider this as a WIP.
+
 ## Usage
 
 You will find a basic example in the [example](example/).
