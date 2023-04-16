@@ -1,6 +1,6 @@
-body {
-	color: #fafafa;
-	background-color: #221f1f;
+html {
+	color: var(--fg-color);
+	background-color: var(--bg-color);
 	font-family: monospace;
 }
 
@@ -18,15 +18,11 @@ img {
 }
 
 a {
-	color: #aaa;
+	color: #fb0067;
 }
 
 a:hover {
-	color: #999;
-}
-
-a:target {
-	background-color: #444;
+	color: #fb0067;
 }
 
 a.d,
@@ -37,7 +33,7 @@ a.line {
 }
 
 #blob a {
-	color: #666;
+	color: #fb0067;
 }
 
 #blob a:hover {
@@ -115,4 +111,29 @@ pre a.h:hover,
 pre a.i:hover,
 pre a.d:hover {
 	text-decoration: none;
+}
+
+html {
+  --bg-color: #1e1e1e;
+  --fg-color: #b8bcb9;
+  --cursor-color: #f83d19;
+  --selection-background-color: #292c31;
+  --selection-foreground-color: #1e1e1e;
+  --color0: #3a3c43;
+  --color1: #be3e48;
+  --color2: #869a3a;
+  --color3: #c4a535;
+  --color4: #4e76a1;
+  --color5: #855b8d;
+  --color6: #568ea3;
+  --color7: #b8bcb9;
+  --color8: #888987;
+  --color9: #fb001e;
+  --color10: #0e712e;
+  --color11: #c37033;
+  --color12: #176ce3;
+  --color13: #fb0067;
+  --color14: #2d6f6c;
+  --color15: #fcffb8;
+  --nav-height: 2em;
 }
