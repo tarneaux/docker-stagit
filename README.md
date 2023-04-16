@@ -10,7 +10,7 @@ This only handles the web part. To be able to clone you will need another tool w
 
 ## Usage
 
-You will find a basic example in the [example](example/).
+[example](example/)
 
 TL;DR:
 
