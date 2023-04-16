@@ -1,7 +1,7 @@
 # stagit-docker
 Stagit, containerized.
 
-This only handles the web part. To be able to clone you will need another tool which has read and write access to the repos directory (I'll make my own dockerized one soon)
+This only handles the web part. To be able to clone you will need to use something like [git-http-backend](https://git-scm.com/docs/git-http-backend).
 
 ## Features
 
