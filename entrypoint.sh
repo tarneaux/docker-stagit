@@ -27,10 +27,6 @@ scan_repos() {
     done
 }
 
-scan_repos
-
-[[ -z "$repos_list" ]] && echo "No repos found" && exit 1
-
 prebuild_repo() {
     # Add some informational files for stagit from the env vars
 
@@ -45,13 +41,31 @@ build_repo() {
     echo "Building $1"
     mkdir -p $1 # Don't fail if it already exists. This happens when we build after the first time
     echo $REPOS_PATH/$1
-    (cd $repo; stagit -c /stagit.cache -u $BASEURL $REPOS_PATH/$1)
+    mkdir -p /stagit-cache/
+    (cd $repo; stagit -c /stagit-cache/$1 -u $BASEURL $REPOS_PATH/$1)
     echo "Done building $1"
 }
 
 build() {
     scan_repos
     cd $BUILD_PATH
+
+    # Remove build cache files if the repo was deleted
+    # Having an old cache file if the repo comes back will cause stagit to fail
+    [[ -d /stagit-cache/ ]] && {
+        cd /stagit-cache/
+        for repo in $(ls -a); do
+            if [[ $repo == "." ]] || [[ $repo == ".." ]]; then
+                continue
+            fi
+            # If the repo is not in the list of repos, remove it
+            if [[ ! $(echo " $repos_list " | grep " $repo ") ]]; then
+                echo "Removing $repo from cache"
+                rm -rf $repo
+            fi
+        done
+        cd -
+    }
 
     for repo in $repos_list; do
         prebuild_repo $repo
@@ -67,19 +81,58 @@ build() {
 
     stagit-index $stagit_index_args_list > index.html
 
-    # Make some symlinks to the config files and ignore errors that occur if they already exist
-    ln -s $CONFIG_PATH/style.css $BUILD_PATH/style.css || :
-    ln -s $CONFIG_PATH/logo.png $BUILD_PATH/logo.png || :
-    ln -s $CONFIG_PATH/favicon.png $BUILD_PATH/favicon.png || :
+    # If style already exists, in root, it means we're rebuilding.
+    if [[ ! -f $BUILD_PATH/style.css ]]; then
+        ln -s $CONFIG_PATH/style.css $BUILD_PATH/style.css
+        ln -s $CONFIG_PATH/logo.png $BUILD_PATH/logo.png
+        ln -s $CONFIG_PATH/favicon.png $BUILD_PATH/favicon.png
 
-    # We also want the configs in all of the repos
-    for repo in $repos_list; do
-        ln -s $CONFIG_PATH/style.css $BUILD_PATH/$repo/style.css || :
-        ln -s $CONFIG_PATH/logo.png $BUILD_PATH/$repo/logo.png || :
-        ln -s $CONFIG_PATH/favicon.ico $BUILD_PATH/$repo/favicon.ico || :
-    done
+        # We also want the configs in all of the repos
+        for repo in $repos_list; do
+            ln -s $CONFIG_PATH/style.css $BUILD_PATH/$repo/style.css
+            ln -s $CONFIG_PATH/logo.png $BUILD_PATH/$repo/logo.png
+            ln -s $CONFIG_PATH/favicon.ico $BUILD_PATH/$repo/favicon.ico
+        done
+    else
+        for repo in $repos_list; do
+            # Allow symlink creation to fail if the repo was deleted
+            {
+                ln -s $CONFIG_PATH/style.css $BUILD_PATH/$repo/style.css
+                ln -s $CONFIG_PATH/logo.png $BUILD_PATH/$repo/logo.png
+                ln -s $CONFIG_PATH/favicon.ico $BUILD_PATH/$repo/favicon.ico
+            } > /dev/null 2>&1 || :
+        done
+    fi
 }
+
+scan_repos
+
+[[ -z "$repos_list" ]] && echo "No repos found" && exit 1
 
 build
 
-exec nginx -g "daemon off;"
+nginx -g "daemon off;" &
+echo $! > /tmp/nginx.pid
+
+{
+    find $REPOS_PATH -type f -exec md5sum {} \; > /tmp/old_checksums
+    while true; do
+        # Sleep for 10s and then make checksums to see if anything has changed
+        sleep 10
+        find $REPOS_PATH -type f -exec md5sum {} \; > /tmp/checksums
+        if ! diff /tmp/checksums /tmp/old_checksums; then
+            echo "Changes detected"
+            scan_repos
+            build
+        fi
+        mv /tmp/checksums /tmp/old_checksums
+    done
+} &
+echo $! > /tmp/watcher.pid
+
+wait -n
+
+kill $(cat /tmp/watcher.pid)
+kill $(cat /tmp/nginx.pid)
+
+exit $?
