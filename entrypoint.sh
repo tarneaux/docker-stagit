@@ -66,7 +66,7 @@ build() {
 
     ln -s $CONFIG_PATH/style.css $BUILD_PATH/style.css
     ln -s $CONFIG_PATH/logo.png $BUILD_PATH/logo.png
-    ln -s $CONFIG_PATH/favicon.ico $BUILD_PATH/favicon.ico
+    ln -s $CONFIG_PATH/favicon.png $BUILD_PATH/favicon.png
 
     # We also want the configs in all of the repos
     for repo in $repos_list; do
