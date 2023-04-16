@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 BUILD_PATH=/usr/share/nginx/html
 
 REPOS_PATH=/repos
@@ -11,10 +13,11 @@ CONFIG_PATH=/config
 
 scan_repos() {
     cd $REPOS_PATH
-    pre_repos_list=$(ls -d */ .*/) # List all repos, including ones starting with a dot (hidden)
+    pre_repos_list=$(find . -name .git)
     cd -
     repos_list=""
     for repo in $pre_repos_list; do
+        repo=$(echo $repo | cut -d'/' -f2)
         # Filter out private repos
         if [[ -f $REPOS_PATH/$repo/.private ]]; then
             echo "Private repo: $repo"
