@@ -43,9 +43,9 @@ prebuild_repo() {
 
 build_repo() {
     echo "Building $1"
-    mkdir $1
+    mkdir -p $1 # Don't fail if it already exists. This happens when we build after the first time
     echo $REPOS_PATH/$1
-    (cd $repo; stagit -u $BASEURL $REPOS_PATH/$1)
+    (cd $repo; stagit -c /stagit.cache -u $BASEURL $REPOS_PATH/$1)
     echo "Done building $1"
 }
 
@@ -67,15 +67,16 @@ build() {
 
     stagit-index $stagit_index_args_list > index.html
 
-    ln -s $CONFIG_PATH/style.css $BUILD_PATH/style.css
-    ln -s $CONFIG_PATH/logo.png $BUILD_PATH/logo.png
-    ln -s $CONFIG_PATH/favicon.png $BUILD_PATH/favicon.png
+    # Make some symlinks to the config files and ignore errors that occur if they already exist
+    ln -s $CONFIG_PATH/style.css $BUILD_PATH/style.css || :
+    ln -s $CONFIG_PATH/logo.png $BUILD_PATH/logo.png || :
+    ln -s $CONFIG_PATH/favicon.png $BUILD_PATH/favicon.png || :
 
     # We also want the configs in all of the repos
     for repo in $repos_list; do
-        ln -s $CONFIG_PATH/style.css $BUILD_PATH/$repo/style.css
-        ln -s $CONFIG_PATH/logo.png $BUILD_PATH/$repo/logo.png
-        ln -s $CONFIG_PATH/favicon.ico $BUILD_PATH/$repo/favicon.ico
+        ln -s $CONFIG_PATH/style.css $BUILD_PATH/$repo/style.css || :
+        ln -s $CONFIG_PATH/logo.png $BUILD_PATH/$repo/logo.png || :
+        ln -s $CONFIG_PATH/favicon.ico $BUILD_PATH/$repo/favicon.ico || :
     done
 }
 
