@@ -7,6 +7,7 @@ This only handles the web part. To be able to clone you will need to use somethi
 
 - [x] filter out repos that contain a `.private` file in their root
 - [x] automatically rebuild when a repo is changed
+- [ ] gracefully stopping
 
 ## Usage
 
