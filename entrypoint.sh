@@ -17,7 +17,7 @@ scan_repos() {
     cd -
     repos_list=""
     for repo in $pre_repos_list; do
-        repo=$(echo $repo | cut -d'/' -f2)
+        repo=$(echo "$repo" | cut -d'/' -f2)
         # Filter out private repos
         if [[ -f $REPOS_PATH/$repo/.private ]]; then
             echo "Private repo: $repo"
@@ -31,18 +31,18 @@ prebuild_repo() {
     # Add some informational files for stagit from the env vars
 
     # owner, except if overridden by a file in the repo
-    [[ $OWNER ]] && [[ -f $REPOS_PATH/$1/.git/owner ]] || echo $OWNER > $REPOS_PATH/$1/.git/owner
+    [[ $OWNER ]] && [[ -f $REPOS_PATH/$1/.git/owner ]] || echo "$OWNER" > "$REPOS_PATH/$1/.git/owner"
 
     # Remote url for git. Changes according to the repo name
-    [[ $REMOTE ]] && echo $REMOTE/$1 > $REPOS_PATH/$1/.git/url
+    [[ $REMOTE ]] && echo "$REMOTE/$1" > "$REPOS_PATH/$1/.git/url"
 }
 
 build_repo() {
     echo "Building $1"
-    mkdir -p $1 # Don't fail if it already exists. This happens when we build after the first time
-    echo $REPOS_PATH/$1
+    mkdir -p "$1" # Don't fail if it already exists. This happens when we build after the first time
+    echo "$REPOS_PATH/$1"
     mkdir -p /stagit-cache/
-    (cd $repo; stagit -c /stagit-cache/$1 -u $BASEURL $REPOS_PATH/$1)
+    (cd "$repo"; stagit -c "/stagit-cache/$1" -u "$BASEURL" "$REPOS_PATH/$1")
     echo "Done building $1"
 }
 
@@ -54,22 +54,22 @@ build() {
     # Having an old cache file if the repo comes back will cause stagit to fail
     [[ -d /stagit-cache/ ]] && {
         cd /stagit-cache/
-        for repo in $(ls -a); do
+        for repo in .?*; do
             if [[ $repo == "." ]] || [[ $repo == ".." ]]; then
                 continue
             fi
             # If the repo is not in the list of repos, remove it
-            if [[ ! $(echo " $repos_list " | grep " $repo ") ]]; then
+            if echo " $repos_list " | grep -q " $repo "; then
                 echo "Removing $repo from cache"
-                rm -rf $repo
+                rm -rf "$repo"
             fi
         done
         cd -
     }
 
     for repo in $repos_list; do
-        prebuild_repo $repo
-        build_repo $repo
+        prebuild_repo "$repo"
+        build_repo "$repo"
     done
 
     stagit_index_args_list=""
@@ -77,8 +77,9 @@ build() {
         stagit_index_args_list="$stagit_index_args_list $REPOS_PATH/$repo"
     done
 
-    echo $stagit_index_args_list
+    echo "$stagit_index_args_list"
 
+    # Missing double quotes here is intentional
     stagit-index $stagit_index_args_list > index.html
 
     # If style already exists, in root, it means we're rebuilding.
@@ -89,17 +90,17 @@ build() {
 
         # We also want the configs in all of the repos
         for repo in $repos_list; do
-            ln -s $CONFIG_PATH/style.css $BUILD_PATH/$repo/style.css
-            ln -s $CONFIG_PATH/logo.png $BUILD_PATH/$repo/logo.png
-            ln -s $CONFIG_PATH/favicon.ico $BUILD_PATH/$repo/favicon.ico
+            ln -s $CONFIG_PATH/style.css "$BUILD_PATH/$repo/style.css"
+            ln -s $CONFIG_PATH/logo.png "$BUILD_PATH/$repo/logo.png"
+            ln -s $CONFIG_PATH/favicon.ico "$BUILD_PATH/$repo/favicon.ico"
         done
     else
         for repo in $repos_list; do
             # Allow symlink creation to fail if the repo was deleted
             {
-                ln -s $CONFIG_PATH/style.css $BUILD_PATH/$repo/style.css
-                ln -s $CONFIG_PATH/logo.png $BUILD_PATH/$repo/logo.png
-                ln -s $CONFIG_PATH/favicon.ico $BUILD_PATH/$repo/favicon.ico
+                ln -s $CONFIG_PATH/style.css "$BUILD_PATH/$repo/style.css"
+                ln -s $CONFIG_PATH/logo.png "$BUILD_PATH/$repo/logo.png"
+                ln -s $CONFIG_PATH/favicon.ico "$BUILD_PATH/$repo/favicon.ico"
             } > /dev/null 2>&1 || :
         done
     fi
@@ -128,11 +129,12 @@ echo $! > /tmp/nginx.pid
         mv /tmp/checksums /tmp/old_checksums
     done
 } &
+
 echo $! > /tmp/watcher.pid
 
 wait -n
 
-kill $(cat /tmp/watcher.pid)
-kill $(cat /tmp/nginx.pid)
+kill "$(cat /tmp/watcher.pid)"
+kill "$(cat /tmp/nginx.pid)"
 
 exit $?
